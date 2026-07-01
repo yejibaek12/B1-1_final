@@ -92,11 +92,37 @@ B1-1/
 | `agent-dev` | 개발/운영, `monitor.sh` 작성자 | `agent-common`, `agent-core` |
 | `agent-test` | QA/테스트 | `agent-common` |
 
+- *확인 방법*: `id <계정명>` (예: `id agent-admin`)
+
 | 디렉토리 | 접근 그룹 | 권한 |
 |----------|-----------|------|
 | `$AGENT_HOME/upload_files` | `agent-common` | R/W |
 | `$AGENT_HOME/api_keys` | `agent-core` | R/W |
 | `/var/log/agent-app` | `agent-core` | R/W |
+
+- *확인 방법*:
+  - **소유권 및 기본 권한**: `ls -ld <디렉토리_경로>` (예: `ls -ld $AGENT_HOME/upload_files`)
+    * *결과 예시*:
+      ```bash
+      drwxrwx---+ 2 agent-admin agent-common 4096 Jul  1 18:00 /home/agent-admin/agent-app/upload_files
+      ```
+      (권한 표시 맨 뒤의 `+` 기호는 ACL이 적용되어 있음을 의미)
+  - **ACL 상세 설정**: `getfacl <디렉토리_경로>` (예: `getfacl $AGENT_HOME/upload_files`)
+    * *결과 예시*:
+      ```
+      # file: upload_files
+      # owner: agent-admin
+      # group: agent-common
+      user::rwx
+      group::rwx
+      group:agent-common:rwx
+      mask::rwx
+      other::---
+      ```
+
+> [!NOTE]
+> **ACL (Access Control List) 개념**:
+> 일반 리눅스 권한 체계는 `소유자:그룹:기타사용자` 기반으로 작동하여 하나의 디렉토리에 오직 단 하나의 대표 그룹만 지정할 수 있습니다. 이에 비해 ACL(Access Control List)을 사용하면 전통적인 권한 체계를 유지하면서도, 특정 디렉토리에 여러 개의 그룹이나 사용자별로 각각 다른 권한(R/W/X)을 독립적이고 유연하게 설정할 수 있습니다.
 
 ### `monitor.sh` 동작 흐름
 
